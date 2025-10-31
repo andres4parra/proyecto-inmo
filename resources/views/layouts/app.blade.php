@@ -1,93 +1,40 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inmobiliaria</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --color-rojo: #d32f2f;
-            --color-negro: #000000;
-            --color-blanco: #ffffff;
-        }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        body {
-            background-color: var(--color-blanco);
-            color: var(--color-negro);
-        }
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
-        .navbar {
-            background-color: var(--color-negro) !important;
-        }
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        .navbar-brand img {
-            height: 50px;
-        }
-
-        .btn-primary {
-            background-color: var(--color-rojo);
-            border-color: var(--color-rojo);
-        }
-
-        .btn-primary:hover {
-            background-color: #b71c1c;
-            border-color: #b71c1c;
-        }
-
-        .section-title {
-            color: var(--color-rojo);
-            font-weight: bold;
-        }
-
-        footer {
-            background-color: var(--color-negro);
-            color: var(--color-blanco);
-            padding: 20px 0;
-            text-align: center;
-        }
-    </style>
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body>
+<body class="font-sans antialiased">
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        @include('layouts.navigation')
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom border-danger shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <img src="{{ asset('inmobiliaria-removebg-preview.png') }}" alt="Logo Inmobiliaria"
-                    style="height: 50px;">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link text-danger fw-bold" href="{{ url('/') }}">Inicio</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link text-danger fw-bold"
-                            href="{{ route('propiedades.index') }}">Propiedades</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger fw-bold"
-                            href="{{ route('contacto.form') }}">Contacto</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+        <!-- Page Heading -->
+        @isset($header)
+            <header class="bg-white dark:bg-gray-800 shadow">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    {{ $header }}
+                </div>
+            </header>
+        @endisset
 
+        <!-- Page Content -->
+        <main>
+            @yield('content')
+        </main>
 
-
-    <!-- Contenido dinámico -->
-    <main class="container py-5">
-        @yield('content')
-    </main>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; {{ date('Y') }} Inmobiliaria. Todos los derechos reservados.</p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
 </body>
 
 </html>
