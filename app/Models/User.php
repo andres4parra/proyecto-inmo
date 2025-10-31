@@ -11,12 +11,11 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $table = 'usuarios';
+    // Indica que la clave primaria se llama 'id' (si la renombraste de id_usuario)
+    protected $primaryKey = 'id'; 
+    
+    // Permite que estos campos se llenen con User::create()
     protected $fillable = [
         'name',
         'email',
