@@ -30,14 +30,21 @@ class ContractController extends Controller
      */
     public function create()
     {
-        // Obtenemos todas las propiedades para que el usuario pueda seleccionar.
+        // 1. Obtenemos todas las propiedades para que el usuario pueda seleccionar.
         $propiedades = Propiedad::select('id', 'titulo')->get();
         
-        // CORRECCIÓN: Obtenemos TODOS los usuarios (clientes potenciales).
+        // 2. Obtenemos TODOS los usuarios (clientes potenciales).
         // Usamos 'name as nombre' para que el campo se mapee a 'nombre' en la vista.
         $clientes = User::select('id', 'name as nombre')->get(); 
         
-        return view('admin.contracts.create', compact('propiedades', 'clientes'));
+        // 3. DEFINICIÓN Y PASE DE LA VARIABLE DE LISTA FALTANTE (Solo Arrendamientos)
+        $tipos_contrato = [
+            'alquiler' => 'Alquiler Tradicional',
+            'arrendamiento_normal' => 'Arrendamiento Normal',
+            'arrendamiento_comercial' => 'Arrendamiento Comercial',
+        ];
+
+        return view('admin.contracts.create', compact('propiedades', 'clientes', 'tipos_contrato'));
     }
 
     /**
@@ -45,16 +52,20 @@ class ContractController extends Controller
      */
     public function store(Request $request)
     {
+        // Tipos de contrato permitidos (SOLO ARRIENDOS)
+        $allowedTypes = 'alquiler,arrendamiento_normal,arrendamiento_comercial';
+
         // Validación ajustada a los campos del formulario
         $validator = Validator::make($request->all(), [
             'propiedad_id' => 'required|exists:propiedades,id', 
-            'user_id' => 'required|exists:users,id', // ID del usuario (cliente)
+            'user_id' => 'required|exists:usuarios,id', 
             'nombre_cliente' => 'required|string|max:255', 
             'cedula_cliente' => 'required|string|max:50|unique:contratos,cedula_cliente', 
             'fecha_inicio' => 'required|date', 
             'fecha_fin' => 'nullable|date|after:fecha_inicio', 
             'monto_acordado' => 'required|numeric|min:0', 
-            'tipo_contrato' => 'required|in:alquiler,venta', 
+            'tipo_contrato' => 'required|in:'.$allowedTypes, 
+            'detalles' => 'nullable|string', // Añadido para asegurar que 'detalles' se incluya en el fillable si está presente
             'pdf_file' => 'nullable|file|mimes:pdf|max:5000', // Máx 5MB
         ]);
 
@@ -62,8 +73,12 @@ class ContractController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        // --- INICIO DE CORRECCIÓN DE MASS ASSIGNMENT ---
+        // Excluimos explícitamente el token CSRF y el archivo, para que solo queden los campos de la DB
+        $data = $request->except(['_token', 'pdf_file']); 
+        
         // Crear el contrato con los datos validados
-        $contract = Contrato::create($request->except('pdf_file'));
+        $contract = Contrato::create($data); 
 
         // Manejo del Archivo (PDF)
         if ($request->hasFile('pdf_file')) {
@@ -95,9 +110,16 @@ class ContractController extends Controller
         
         // Obtenemos todos los usuarios para la edición.
         $clients = User::select('id', 'name')->get(); 
+        
+        // DEFINICIÓN DE LOS TIPOS DE CONTRATO PARA LA VISTA DE EDICIÓN (Solo Arriendos)
+        $tipos_contrato = [
+            'alquiler' => 'Alquiler Tradicional',
+            'arrendamiento_normal' => 'Arrendamiento Normal',
+            'arrendamiento_comercial' => 'Arrendamiento Comercial',
+        ];
 
         // La vista debe estar en resources/views/admin/contracts/edit.blade.php
-        return view('admin.contracts.edit', compact('contract', 'propiedades', 'clients')); 
+        return view('admin.contracts.edit', compact('contract', 'propiedades', 'clients', 'tipos_contrato')); 
     }
 
     /**
@@ -107,16 +129,21 @@ class ContractController extends Controller
     {
         $contract = Contrato::findOrFail($id);
 
+        // Tipos de contrato permitidos (SOLO ARRIENDOS)
+        $allowedTypes = 'alquiler,arrendamiento_normal,arrendamiento_comercial';
+        
         $validator = Validator::make($request->all(), [
             'propiedad_id' => 'required|exists:propiedades,id',
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:usuarios,id',
             'nombre_cliente' => 'required|string|max:255', 
             // unique con ignore para que permita mantener la misma cédula
             'cedula_cliente' => 'required|string|max:50|unique:contratos,cedula_cliente,'.$id, 
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'nullable|date|after:fecha_inicio',
             'monto_acordado' => 'required|numeric|min:0', 
-            'tipo_contrato' => 'required|in:alquiler,venta',
+            // Validamos contra los tipos de arrendamiento
+            'tipo_contrato' => 'required|in:'.$allowedTypes,
+            'detalles' => 'nullable|string', // Añadido
             'pdf_file' => 'nullable|file|mimes:pdf|max:5000', 
         ]);
 
@@ -124,9 +151,13 @@ class ContractController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        // --- INICIO DE CORRECCIÓN DE MASS ASSIGNMENT ---
+        // Excluimos explícitamente el token CSRF y el archivo, para que solo queden los campos de la DB
+        $data = $request->except(['_token', 'pdf_file']); 
+        
         // Actualizar datos del contrato
-        $contract->update($request->except('pdf_file'));
-
+        $contract->update($data); 
+        
         // Manejo de la actualización del archivo PDF
         if ($request->hasFile('pdf_file')) {
             // 1. Eliminar el archivo PDF anterior si existe
