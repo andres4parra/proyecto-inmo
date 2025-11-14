@@ -64,9 +64,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('properties', AdminPropiedadController::class)
              ->except(['show']); // No necesitamos la vista individual ya que la pública existe
 
+        
         // 3. CONTRATOS
-        // 3. CONTRATOS
-        Route::get('/contratos', [ContractController::class, 'index'])->name('contracts'); 
+        Route::resource('contracts', ContractController::class); 
         
         // 4. USUARIOS
         // Si no existe el controlador Admin\UserController, usa una ruta con closure que carga la vista de usuarios del admin.
