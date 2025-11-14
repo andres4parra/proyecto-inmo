@@ -30,37 +30,52 @@ class PropiedadController extends Controller
      * Implementa validación básica.
      */
     public function store(Request $request) 
-    {
-        // 1. Reglas de Validación
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'bedrooms' => 'nullable|integer|min:0',
-            'bathrooms' => 'nullable|integer|min:0',
-            'address' => 'nullable|string|max:255',
-            'main_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+{
+    // 1. Reglas de Validación: Usamos los nombres del formulario
+    $validator = Validator::make($request->all(), [
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'price' => 'required|numeric|min:0',
+        'bedrooms' => 'nullable|integer|min:0',
+        'bathrooms' => 'nullable|integer|min:0',
+        'address' => 'nullable|string|max:255',
+        // El formulario no tenía 'ciudad', 'tipo', 'area'. Debes validar si son obligatorios en tu DB.
+        // Asumiendo que son obligatorios (No en la columna Nulo de tu imagen)
+        'ciudad' => 'required|string|max:255',
+        'tipo' => 'required|in:venta,arriendo', // Basado en el tipo ENUM de tu DB
+        'area' => 'required|integer|min:1', // Basado en tu DB (int(11) NO NULL)
+        'main_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                             ->withErrors($validator)
-                             ->withInput();
-        }
-
-        // 2. Crear y Guardar la Propiedad
-        $property = Propiedad::create($request->except('main_image'));
-        
-        // 3. Manejo de Archivo (Imagen)
-        if ($request->hasFile('main_image')) {
-            $imagePath = $request->file('main_image')->store('properties', 'public');
-            $property->main_image_path = $imagePath;
-            $property->save();
-        }
-
-        return redirect()->route('admin.properties.index')
-                         ->with('success', 'Propiedad "' . $property->title . '" creada exitosamente.');
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
     }
+    
+    // 2. Manejo de Archivo (Guardar la imagen en el servidor)
+    if ($request->hasFile('main_image')) {
+        // Guarda el archivo en storage/app/public/properties
+        $imagePath = $request->file('main_image')->store('properties', 'public');
+        // Aquí puedes hacer algo con $imagePath si fuera necesario, pero como
+        // no hay columna en la DB, simplemente lo guardamos en el servidor.
+    }
+    
+    // 3. Crear y Guardar la Propiedad: Mapeando los nombres
+    // Usamos el método create y mapeamos manualmente para evitar un error 'Unknown column'
+    $property = Propiedad::create([
+        'titulo' => $request->title, // Mapeo: title (form) -> titulo (DB)
+        'descripcion' => $request->description, // Mapeo: description (form) -> descripcion (DB)
+        'precio' => $request->price,
+        'ciudad' => $request->ciudad, // Campo que debes asegurar que envías desde el formulario
+        'ubicacion' => $request->address, // Mapeo: address (form) -> ubicacion (DB)
+        'tipo' => $request->tipo, // Campo que debes asegurar que envías desde el formulario
+        'habitaciones' => $request->bedrooms, // Mapeo: bedrooms (form) -> habitaciones (DB)
+        'banos' => $request->bathrooms, // Mapeo: bathrooms (form) -> banos (DB)
+        'area' => $request->area, // Campo que debes asegurar que envías desde el formulario
+        // La imagen NO se guarda en la DB
+    ]);
+
+    return redirect()->route('admin.properties.index')->with('success', 'Propiedad creada exitosamente.');
+}
 
     // Muestra el formulario para editar una propiedad
     public function edit($id) 
