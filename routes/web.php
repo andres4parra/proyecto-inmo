@@ -8,6 +8,7 @@ use App\Http\Controllers\ContactoController;
 // Rutas de Administración
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\ContractController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PropiedadController as AdminPropiedadController; // Usamos un alias para el controlador de Admin
 use App\Models\Propiedad;
 
@@ -70,10 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // 4. USUARIOS
         // Si no existe el controlador Admin\UserController, usa una ruta con closure que carga la vista de usuarios del admin.
-        Route::get('/usuarios', function () {
-             return view('admin.users.index');
-        })->name('users'); 
-
+        Route::get('usuarios', [AdminUserController::class, 'index'])->name('users');
         // 5. MENSAJES
         Route::get('/mensajes', function () { 
              return view('admin.messages.index'); 
