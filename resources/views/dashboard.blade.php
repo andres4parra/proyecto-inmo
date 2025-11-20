@@ -66,11 +66,7 @@ $formatDate = function ($dateString) {
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-bold">Panel de Administración</h1>
             
-            {{-- Botón para ir a Agregar Propiedad --}}
-            <a href="{{ route('admin.properties.index', ['new' => 'true']) }}" class="flex items-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                Añadir Propiedad
-            </a>
+        
         </div>
 
         <div class="grid gap-6 grid-cols-1 xl:grid-cols-2">
@@ -132,7 +128,7 @@ $formatDate = function ($dateString) {
                             </h2>
                             <p class="text-gray-500">Los 3 mensajes más recientes</p>
                         </div>
-                        <a href="{{ route('admin.messages') }}" class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold py-1 px-3 rounded text-sm">
+                        <a href="{{ route('admin.messages.index') }}" class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold py-1 px-3 rounded text-sm">
                             Ver todos
                         </a>
                     </div>

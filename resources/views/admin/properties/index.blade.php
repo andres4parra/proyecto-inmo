@@ -1,3 +1,4 @@
+
 @extends('layouts.admin')
 
 @section('title', 'Gestión de Propiedades')

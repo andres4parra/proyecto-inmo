@@ -1,80 +1,90 @@
-@extends('layouts.admin') {{-- Asumo que usas un layout principal llamado 'admin' --}}
+@extends('layouts.admin') {{-- Asume que tienes un layout principal para el admin --}}
 
 @section('title', 'Gestión de Usuarios')
 
 @section('content')
+
 <div class="container mx-auto px-4 py-6">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800">Gestión de Usuarios</h1>
+<h1 class="text-3xl font-bold mb-6 text-gray-800">Gestión de Usuarios</h1>
 
-    {{-- Enlace para Crear Nuevo Usuario --}}
-    <div class="mb-4 flex justify-end">
-        <a href="{{ route('admin.users.create') }}" 
-           class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-[1.01]">
-            + Crear Nuevo Usuario
-        </a>
-    </div>
-
-    {{-- Mensajes de Sesión (Éxito/Error) --}}
-    @if (session('success'))
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded shadow-sm" role="alert">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded shadow-sm" role="alert">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    {{-- Tabla de Usuarios --}}
-    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol (ej.)</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registrado</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse ($users as $user)
-                        <tr class="hover:bg-gray-50 transition duration-150">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->id }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $user->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $user->email }}</td>
-                            {{-- Columna de Rol (si tienes un campo 'role' en tu modelo User) --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{-- Si tu modelo User tiene un campo 'role', úsalo aquí --}}
-                                {{ $user->role ?? 'Cliente' }} 
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $user->created_at->format('d/m/Y') }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                {{-- Botón de Edición --}}
-                                <a href="{{ route('admin.users.edit', $user->id) }}" 
-                                   class="text-indigo-600 hover:text-indigo-900">Editar</a>
-
-                                {{-- Botón de Eliminación --}}
-                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este usuario? Esta acción no se puede deshacer.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900 ml-2">Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500 text-lg">No hay usuarios registrados.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
+{{-- Enlace para Crear Nuevo Usuario (Ajustado a color Rojo) --}}
+<div class="mb-4 flex justify-end">
+    <a href="{{ route('admin.users.create') }}"
+        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-[1.01]">
+        + Crear Nuevo Usuario
+    </a>
 </div>
+
+{{-- Mensajes de Sesión (Éxito/Error) --}}
+@if (session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded shadow-sm" role="alert">
+        {{ session('success') }}
+    </div>
+@endif
+
+<div class="bg-white shadow-xl rounded-lg overflow-hidden">
+    <table class="min-w-full leading-normal">
+        <thead>
+            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <th class="py-3 px-6 text-left">ID</th>
+                <th class="py-3 px-6 text-left">Nombre</th>
+                <th class="py-3 px-6 text-left">Email</th>
+                <th class="py-3 px-6 text-center">Rol</th>
+                <th class="py-3 px-6 text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-600 text-sm font-light">
+            @forelse ($users as $user)
+            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                    {{ $user->id }}
+                </td>
+                <td class="py-3 px-6 text-left">
+                    {{ $user->name }}
+                </td>
+                <td class="py-3 px-6 text-left">
+                    {{ $user->email }}
+                </td>
+                <td class="py-3 px-6 text-center">
+                    {{ $user->role ?? 'Cliente' }}
+                </td>
+                <td class="py-3 px-6 text-center">
+                    <div class="flex item-center justify-center space-x-2">
+                        {{-- Botón Editar (Cambiado a gris neutro) --}}
+                        <a href="{{ route('admin.users.edit', $user->id) }}" class="text-gray-600 hover:text-gray-900" title="Editar">
+                            <i class="lucide lucide-edit" style="width: 18px; height: 18px;"></i>
+                        </a>
+
+                        {{-- Botón Eliminar (Ya estaba en rojo) --}}
+                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este usuario?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar">
+                                <i class="lucide lucide-trash-2" style="width: 18px; height: 18px;"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5" class="py-6 text-center text-gray-500">
+                    No hay usuarios registrados.
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+
+</div>
+
+<script>
+// Para asegurar que los iconos de Lucide se rendericen
+if (typeof lucide !== 'undefined') {
+lucide.createIcons();
+}
+</script>
+
 @endsection

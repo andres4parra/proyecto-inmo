@@ -45,45 +45,62 @@
                         Asesoría Personalizada
                     </h1>
 
-                    <form method="POST" action="{{ route('contacto.enviar') }}">
+                    {{-- Usamos la ruta 'contacto.enviar' que es la que se usó en el controlador corregido --}}
+                    <form method="POST" action="{{ route('contacto.enviar') }}"> 
                         @csrf
                         <div class="mb-4">
-                            <label for="nombre" class="form-label fw-medium">
+                            <label for="name" class="form-label fw-medium">
                                 <i class="lucide lucide-user me-1 text-primary"></i>
                                 Nombre completo
                             </label>
-                            <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Escribe tu nombre" required>
+                            {{-- NAME: 'name' (COINCIDE CON LA DB) --}}
+                            <input type="text" id="name" name="name" class="form-control" placeholder="Escribe tu nombre" required value="{{ old('name') }}">
                         </div>
 
                         <div class="mb-4">
-                            <label for="correo" class="form-label fw-medium">
-                                <i class="lucide lucide-mail me-1 text-primary"></i>
-                                Correo electrónico
+                            <label for="phone" class="form-label fw-medium">
+                                <i class="lucide lucide-smartphone me-1 text-primary"></i>
+                                Número de Celular / WhatsApp
                             </label>
-                            <input type="email" id="correo" name="correo" class="form-control" placeholder="ejemplo@correo.com" required>
+                            {{-- NAME: 'phone' (COINCIDE CON LA DB) --}}
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                class="form-control" 
+                                placeholder="Ej: 316 123 4567" 
+                                required 
+                                value="{{ old('phone') }}"
+                            >
+                            <div class="form-text text-muted mt-1">
+                                Asegúrate de incluir el código de área (si aplica). Usaremos este número para WhatsApp.
+                            </div>
                         </div>
                         
+                        {{-- ELIMINADO: No necesitamos el campo oculto "senderEmail" ya que no existe en tu tabla de DB. --}}
+                        {{-- <input type="hidden" name="senderEmail" value="no-provided@inmobiliaria.com"> --}}
+
                         <div class="mb-4">
-                            <label for="asunto" class="form-label fw-medium">
+                            <label for="subject" class="form-label fw-medium">
                                 <i class="lucide lucide-tag me-1 text-primary"></i>
                                 Asunto
                             </label>
-                            <select id="asunto" name="asunto" class="form-select form-control" required>
+                            <select id="subject" name="subject" class="form-select form-control" required>
                                 <option selected disabled value="">Selecciona un asunto...</option>
-                                <option value="arriendo">Información sobre Arriendo</option>
-                                <option value="pago">Consulta sobre Pago de Canon</option>
-                                <option value="mantenimiento">Solicitud de Mantenimiento/Reparación</option>
-                                <option value="otro">Otro</option>
+                                <option value="Información sobre Arriendo">Información sobre Arriendo</option>
+                                <option value="Consulta sobre Pago de Canon">Consulta sobre Pago de Canon</option>
+                                <option value="Solicitud de Mantenimiento/Reparación">Solicitud de Mantenimiento/Reparación</option>
+                                <option value="Otro">Otro</option>
                             </select>
                         </div>
 
 
                         <div class="mb-5">
-                            <label for="mensaje" class="form-label fw-medium">
+                            <label for="message" class="form-label fw-medium">
                                 <i class="lucide lucide-message-square me-1 text-primary"></i>
                                 Mensaje
                             </label>
-                            <textarea id="mensaje" name="mensaje" rows="4" class="form-control" placeholder="Escribe tu mensaje o consulta aquí..." required></textarea>
+                            <textarea id="message" name="message" rows="4" class="form-control" placeholder="Escribe tu mensaje o consulta aquí..." required>{{ old('message') }}</textarea>
                         </div>
 
                         <div class="text-center">
