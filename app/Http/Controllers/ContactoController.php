@@ -39,7 +39,7 @@ class ContactoController extends Controller
             ]);
 
             // 3. Respuesta exitosa
-            return back()->with('success', '¡Tu mensaje ha sido enviado con éxito! Nos pondremos en contacto pronto por WhatsApp o llamada.');
+            return redirect()->back()->with('success', '¡Tu mensaje ha sido enviado correctamente!');
 
         } catch (\Exception $e) {
             // 4. Manejo de error (ej: si falla la conexión a la DB)

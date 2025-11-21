@@ -11,7 +11,7 @@
         Gestión de Mensajes de Contacto
     </h1>
 
-    {{-- Mensaje de éxito (usado después de Marcar Resuelto/Eliminar) --}}
+    {{-- Mensaje de éxito --}}
     @if (session('success'))
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-4" role="alert">
             <p class="font-bold">Éxito</p>
@@ -30,7 +30,7 @@
     @else
         <div class="bg-white shadow-2xl rounded-xl overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-red-50"> {{-- Fondo de la cabecera en rojo suave --}}
+                <thead class="bg-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                             Contacto
@@ -51,15 +51,13 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
                     @foreach ($messages as $message)
-                        {{-- Fila que cambia de color si está resuelto. Pendiente usa amarillo suave (hover) --}}
-                        <tr class="{{ $message->is_resolved ? 'bg-gray-50 text-gray-500 hover:bg-gray-100' : 'hover:bg-orange-50 font-semibold' }}">
+                        <tr class="{{ $message->is_resolved ? 'bg-gray-50 text-gray-500 hover:bg-gray-100' : 'hover:bg-yellow-50 font-semibold' }}">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ $message->name }}</div>
                                 <div class="text-sm text-gray-500">{{ $message->phone ?? 'Sin Teléfono' }}</div>
                             </td>
                             <td class="px-6 py-4 max-w-lg">
-                                <div class="text-sm font-semibold text-red-600">{{ $message->subject ?? 'Sin asunto' }}</div> {{-- Texto del asunto en rojo --}}
-                                {{-- Muestra un extracto del contenido --}}
+                                <div class="text-sm font-semibold text-gray-700">{{ $message->subject ?? 'Sin asunto' }}</div>
                                 <div class="text-xs text-gray-500 overflow-hidden line-clamp-2 mt-1">
                                     {{ Str::limit($message->message, 80) }}
                                 </div>
@@ -69,49 +67,30 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 @if ($message->is_resolved)
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-green-200 text-green-800">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-green-100 text-green-800">
                                         Resuelto
                                     </span>
                                 @else
-                                    {{-- Cambiado a naranja/rojo claro para Pendiente --}}
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-orange-100 text-orange-800 animate-pulse border border-orange-400">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-yellow-100 text-yellow-800 animate-pulse border border-yellow-400">
                                         Pendiente
                                     </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
-                                
-                                {{-- FORMULARIO DE ACCIÓN: La acción del botón es SIEMPRE la opuesta al estado actual --}}
+                                {{-- Botón para cambiar estado --}}
                                 <form action="{{ route('admin.messages.resolve', $message->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH') 
                                     <button type="submit" 
                                             title="{{ $message->is_resolved ? 'Marcar como Pendiente' : 'Marcar como Resuelto' }}"
-                                            class="text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 
-                                                   {{-- CORRECCIÓN DE LÓGICA: Si está resuelto, el botón es naranja (para pendiente). Si está pendiente, el botón es rojo (para resuelto). --}}
-                                                   {{ $message->is_resolved ? 'bg-orange-600 hover:bg-orange-700' : 'bg-red-600 hover:bg-red-700' }}">
-                                        @if ($message->is_resolved)
-                                            <span class="hidden sm:inline">Marcar Pendiente</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        @else
-                                            <span class="hidden sm:inline">Marcar Resuelto</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                                        @endif
+                                            class="text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105
+                                                {{ $message->is_resolved ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600' }}">
+                                        {{ $message->is_resolved ? 'Marcar Pendiente' : 'Marcar Resuelto' }}
                                     </button>
                                 </form>
-                                
-                                {{-- Botón para ver el contenido completo --}}
-                                <a href="{{ route('admin.messages.show', $message->id) }}" 
-                                   title="Ver Detalles"
-                                   class="text-gray-600 hover:text-red-900 ml-2 p-2 rounded-full hover:bg-red-100 transition duration-150">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </a>
 
-                                {{-- FORMULARIO DE ELIMINACIÓN --}}
-                                <form action="{{ route('admin.messages.destroy', $message->id) }}" method="POST" onsubmit="return confirm('ATENCIÓN: ¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.')" class="inline">
+                                {{-- Botón de eliminar --}}
+                                <form action="{{ route('admin.messages.destroy', $message->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este mensaje?')" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" 
@@ -130,8 +109,6 @@
         </div>
     @endif
 </div>
-
-
 </div>
 
 @endsection

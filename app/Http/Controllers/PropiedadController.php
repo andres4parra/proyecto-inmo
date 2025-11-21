@@ -3,29 +3,66 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-// use App\Models\Propiedad; // Descomentar si usas modelos de Eloquent
+use App\Models\Propiedad; // Asegúrate de que este modelo existe y apunta a tu tabla 'propiedades'
 
 class PropiedadController extends Controller
 {
     /**
-     * Muestra la lista de todas las propiedades en arriendo (propiedades/index.blade.php).
+     * Muestra la lista de todas las propiedades en arriendo.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // En un caso real: $propiedades = Propiedad::where('tipo', 'arriendo')->paginate(9);
+        // Obtener filtros desde la URL
+        $tipoInmueble = $request->get('tipoInmueble');
+        $ubicacion = $request->get('ubicacion');
+        $habitaciones = $request->get('habitaciones');
+        $maxPrice = $request->get('maxPrice');
 
-        // Por ahora, solo devuelve la vista:
-        return view('propiedades.index'); 
+        // Construir la query
+        $query = Propiedad::query();
+
+        // Filtro por tipo de inmueble
+        if ($tipoInmueble && $tipoInmueble !== 'Todos') {
+            $query->where('tipo', $tipoInmueble);
+        }
+
+        // Filtro por ubicación (búsqueda parcial)
+        if ($ubicacion) {
+            $query->where('ubicacion', 'like', "%$ubicacion%");
+        }
+
+        // Filtro por habitaciones mínimas
+        if ($habitaciones && $habitaciones !== 'Cualquiera') {
+            $minHabitaciones = (int) str_replace('+', '', $habitaciones);
+            $query->where('habitaciones', '>=', $minHabitaciones);
+        }
+
+        // Filtro por precio máximo
+        if ($maxPrice) {
+            $query->where('precio', '<=', $maxPrice);
+        }
+
+        // Obtener resultados (puedes paginar si quieres)
+        $properties = $query->get();
+
+        // Pasar filtros actuales al Blade para mantener valores seleccionados
+        return view('propiedades.index', compact(
+            'properties',
+            'tipoInmueble',
+            'ubicacion',
+            'habitaciones',
+            'maxPrice'
+        ));
     }
 
     /**
-     * Muestra una propiedad específica por su ID (propiedades/show.blade.php).
+     * Muestra una propiedad específica por su ID.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        // En un caso real: $propiedad = Propiedad::findOrFail($id);
-        
-        // Por ahora, solo devuelve la vista, pasando el ID si es necesario para el ejemplo:
-        return view('propiedades.show', compact('id')); 
+        // Traer la propiedad o mostrar 404 si no existe
+        $property = Propiedad::findOrFail($id);
+
+        return view('propiedades.show', compact('property'));
     }
 }

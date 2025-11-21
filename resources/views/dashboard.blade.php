@@ -20,11 +20,11 @@
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-13v1"></path>
                 </svg>
             </a>
-            <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf
-            </form>
+            <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
         </header>
 
         <main class="p-6">
+
             {{-- Título --}}
             <div class="flex items-center justify-between mb-6">
                 <h1 class="text-3xl font-bold text-red-600">Panel de Administración</h1>
@@ -52,49 +52,48 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {{-- Mensajes Recientes --}}
-                <div class="border rounded-lg shadow-md bg-gradient-to-b from-yellow-50 to-white p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold flex items-center gap-2 text-yellow-700">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 12h.01M12 12h.01M16 12h.01M21 21L15 15M17 12a5 5 0 11-10 0 5 5 0 0110 0z"></path>
-                            </svg>
-                            Mensajes Recientes
-                        </h2>
-                        <a href="{{ route('admin.messages.index') }}"
-                            class="border border-yellow-300 hover:bg-yellow-100 text-yellow-700 font-semibold py-1 px-3 rounded text-sm">
-                            Ver todos
-                        </a>
-                    </div>
-                    <div class="space-y-4">
-                        @forelse (collect($messages)->sortByDesc('createdAt')->take(3) as $message)
-                            <div class="p-4 border-l-4 border-yellow-400 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div>
-                                        <p class="font-semibold text-yellow-800">{{ $message['senderName'] }}</p>
-                                        <p class="text-sm text-yellow-600">{{ $message['senderEmail'] }}</p>
-                                    </div>
-                                    <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium
-                                        @if($message['status'] === 'nuevo') bg-red-600 text-white
-                                        @elseif($message['status'] === 'leido') bg-gray-200 text-gray-800
-                                        @else bg-green-200 text-green-800 @endif">
-                                        {{ ucfirst($message['status']) }}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-800 mb-1 font-medium">{{ $message['subject'] }}</p>
-                                <p class="text-sm text-gray-600 mb-1 line-clamp-2">{{ $message['message'] ?? 'Sin contenido' }}</p>
-                                @if ($message['propertyTitle'])
-                                    <p class="text-xs text-gray-500">Propiedad: {{ $message['propertyTitle'] }}</p>
-                                @endif
-                            </div>
-                        @empty
-                            <p class="text-gray-500 text-center">No hay mensajes recientes.</p>
-                        @endforelse
-                    </div>
+            {{-- Mensajes Recientes (Full Width) --}}
+            <div class="border rounded-lg shadow-md bg-gradient-to-b from-yellow-50 to-white p-6 mb-6 w-full">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-yellow-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 21L15 15M17 12a5 5 0 11-10 0 5 5 0 0110 0z"></path>
+                        </svg>
+                        Mensajes Recientes
+                    </h2>
+                    <a href="{{ route('admin.messages.index') }}"
+                        class="border border-yellow-300 hover:bg-yellow-100 text-yellow-700 font-semibold py-1 px-3 rounded text-sm">
+                        Ver todos
+                    </a>
                 </div>
-
+                <div class="space-y-4">
+                    @forelse (collect($messages)->sortByDesc('createdAt')->take(3) as $message)
+                        <div class="p-4 border-l-4 border-yellow-400 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <p class="font-semibold text-yellow-800">{{ $message['senderName'] }}</p>
+                                    <p class="text-sm text-yellow-600">{{ $message['senderEmail'] }}</p>
+                                </div>
+                                <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium
+                                    @if($message['status'] === 'nuevo') bg-red-600 text-white
+                                    @elseif($message['status'] === 'leido') bg-gray-200 text-gray-800
+                                    @else bg-green-200 text-green-800 @endif">
+                                    {{ ucfirst($message['status']) }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-800 mb-1 font-medium">{{ $message['subject'] }}</p>
+                            <p class="text-sm text-gray-600 mb-1 line-clamp-2">{{ $message['message'] ?? 'Sin contenido' }}</p>
+                            @if ($message['propertyTitle'])
+                                <p class="text-xs text-gray-500">Propiedad: {{ $message['propertyTitle'] }}</p>
+                            @endif
+                        </div>
+                    @empty
+                        <p class="text-gray-500 text-center">No hay mensajes recientes.</p>
+                    @endforelse
+                </div>
             </div>
 
             {{-- Propiedades --}}
