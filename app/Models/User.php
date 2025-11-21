@@ -28,4 +28,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Rol::class, 'usuario_roles', 'id_usuario', 'id_rol');
     }
+    public function propiedades()
+    {
+        return $this->hasMany(Propiedad::class, 'id_dueno');
+    }
 }

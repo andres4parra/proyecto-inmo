@@ -21,5 +21,14 @@ class Propiedad extends Model
         'habitaciones',
         'banos',
         'area',
+        'id_dueno',
     ];
+    public function dueno()
+    {
+        return $this->belongsTo(User::class, 'id_dueno');
+    }
+    public function contratos()
+    {
+        return $this->hasMany(Contrato::class, 'id_propiedad');
+    }
 }
