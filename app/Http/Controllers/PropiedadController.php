@@ -60,9 +60,11 @@ class PropiedadController extends Controller
      */
     public function show($id)
     {
-        // Traer la propiedad o mostrar 404 si no existe
         $property = Propiedad::findOrFail($id);
 
-        return view('propiedades.show', compact('property'));
+        // Initialize features (adjust to your actual relation or attribute)
+        $features = $property->features ?? [];
+
+        return view('propiedades.show', compact('property', 'features'));
     }
 }
